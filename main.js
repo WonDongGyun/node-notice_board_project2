@@ -49,7 +49,6 @@ app.get('/', async (req, res) => {
 // 읽어야 할 게시물을 조회
 app.get('/readBoard', async (req, res) => {
     let boardId = req.query.boardId;
-
     try {
         const read = await Board.findOne({
             where: {
@@ -76,11 +75,16 @@ app.get('/readBoard', async (req, res) => {
 })
 
 // 게시글 작성 페이지
-app.get('/writeBoard', authMWRouter, (req, res) => {
-    console.log(1)
-    res.render('./basicBoard/writeBoard');
-    console.log(2)
+app.get('/auth/writeBoard', authMWRouter, async (req, res) => {
+    res.status(200).send({
+        result: "success",
+        status: 200,
+    });
 })
+app.get('/writeBoard', async (req, res) => {
+    res.render('./basicBoard/writeBoard');
+})
+
 
 // 게시글 수정 페이지
 app.get('/updateBoard', async (req, res) => {

@@ -20,8 +20,8 @@
             readonly value="<%= readBoard['contents'] %>">
     </div>
 
-    <button type="button" id="updateButton" class="btn btn-primary">수정하기</button>
-    <button type="button" id="deleteButton" class="btn btn-danger">삭제하기</button>
+    <div id="readDiv">
+    </div>
 
     <div style="margin-top: 70px;">
         <div class="input-group mb-3">
@@ -38,6 +38,7 @@
                     <th scope="col">nickname</th>
                     <th scope="col">comment</th>
                     <th scope="col">Day</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody id="commentMaster">
@@ -57,6 +58,10 @@
                                 parseInt(commentBoard[i]['commentDay'].getMonth() + 1) + '-' +
                                 commentBoard[i]['commentDay'].getDate() %>
                         </td>
+                        <td>
+                            <button type="button" class="btn btn-outline-secondary" onclick="commentUpd()">수정</button>
+                            <button type="button" class="btn btn-outline-danger" onclick="commentUpd()">삭제</button>
+                        </td>
                     </tr>
                     <% } %>
             </tbody>
@@ -67,25 +72,67 @@
 
 
         <script>
+
+            document.addEventListener('DOMContentLoaded', function () {
+                make_button();
+            })
             const queryString = window.location.search;
             const urlParam = new URLSearchParams(queryString);
             const boardId = urlParam.get('boardId');
+
             let nowButton = "";
 
-            document.getElementById("updateButton").onclick = function (event) {
-                nowButton = event.target.id;
-                chk_modal();
+            function make_button() {
+                let nickname = document.getElementById('nickname').value
+                let token = parseJwt(localStorage.getItem("token"))['nickname'];
+
+                if (localStorage.getItem('token') != null && nickname == token) {
+                    var btn_upd = document.createElement('button');
+                    var btn_del = document.createElement('button');
+                    var read = document.getElementById('readDiv');
+
+                    btn_upd.type = 'button';
+                    btn_del.type = 'button';
+
+                    btn_upd.className = 'btn btn-primary';
+                    btn_del.className = 'btn btn-danger';
+
+                    btn_upd.id = 'updateButton';
+                    btn_del.id = 'deleteButton';
+
+                    btn_upd.onclick = () => {
+                        updButtonSet();
+                        chk_modal();
+                    }
+
+                    btn_del.onclick = () => {
+                        delButtonSet();
+                        chk_modal();
+                    }
+
+                    var loginTxt = document.createTextNode('수정하기');
+                    btn_upd.appendChild(loginTxt);
+
+                    var regTxt = document.createTextNode('삭제하기');
+                    btn_del.appendChild(regTxt);
+
+
+                    read.appendChild(btn_upd);
+                    read.appendChild(btn_del);
+
+                }
             }
 
-            document.getElementById("deleteButton").onclick = function (event) {
-                nowButton = event.target.id;
-                chk_modal();
+            function updButtonSet() {
+                nowButton = 'updateButton';
             }
 
+            function delButtonSet() {
+                nowButton = 'deleteButton';
+            }
 
             // 비밀번호 입력 모달 열기
-            function chk_modal(id) {
-                var button_id = id;
+            function chk_modal() {
                 var myChkModal = new bootstrap.Modal(document.getElementById("chkPassword"), {});
                 myChkModal.show();
             }
@@ -93,38 +140,10 @@
 
             // 모달에서 확인 버튼을 누르면 함수 실행
             function chkPassWord(inputPW) {
-                var chk_ajax = new XMLHttpRequest();
-                var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
-                var myWrongModal = new bootstrap.Modal(document.getElementById("wrongModal"), {});
-
                 let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
 
-                chk_ajax.onload = function () {
-                    if (chk_ajax.status == 200 || chk_ajax.status == 201) {
-
-                        responseTxt = JSON.parse(chk_ajax.responseText)
-
-                        if (responseTxt['result'] == 'success' && nowButton == 'updateButton') {
-                            location.href = '/updateBoard/?boardId=' + boardId;
-
-                        } else if (responseTxt['result'] == 'success' && nowButton == 'deleteButton') {
-                            const modalTitle = document.querySelector('#msgTitle');
-                            var mtTxt = document.createTextNode(responseTxt['modal_title']);
-                            modalTitle.appendChild(mtTxt);
-
-                            const modalBody = document.querySelector('#msgbody');
-                            var mbTxt = document.createTextNode(responseTxt['modal_body']);
-                            modalBody.appendChild(mbTxt);
-
-                            myModal.show();
-
-                        } else {
-                            myWrongModal.show();
-                        }
-                    } else {
-                        myWrongModal.show();
-                    }
-                }
+                var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
+                var myWrongModal = new bootstrap.Modal(document.getElementById("wrongModal"), {});
 
                 const data = {
                     boardId: boardId,
@@ -133,43 +152,54 @@
                     nowButton: nowButton
                 }
 
-                chk_ajax.onerror = function () {
-                    console.error(chk_ajax.responseText);
-                }
+                const url = '/api/chkPassWord';
+                const init = {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin'
+                };
 
-                chk_ajax.open('POST', '/api/chkPassWord');
-                chk_ajax.setRequestHeader('Content-Type', 'application/json');
-                chk_ajax.send(JSON.stringify(data));
+                fetch(url, init)
+                    .then((res) => res.json())
+                    .then(res => {
+
+                        if (res.status == 200 || res.status == 201) {
+                            responseTxt = res;
+
+                            if (responseTxt['result'] == 'success' && nowButton == 'updateButton') {
+                                location.href = '/updateBoard/?boardId=' + boardId;
+
+                            } else if (responseTxt['result'] == 'success' && nowButton == 'deleteButton') {
+                                const modalTitle = document.querySelector('#msgTitle');
+                                var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                                modalTitle.appendChild(mtTxt);
+
+                                const modalBody = document.querySelector('#msgbody');
+                                var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                                modalBody.appendChild(mbTxt);
+
+                                myModal.show();
+
+                            } else {
+                                myWrongModal.show();
+                            }
+                        } else {
+                            myWrongModal.show();
+                        }
+                    })
             }
 
 
-
-
+            // 댓글 추가
             function write_comment() {
-                const write_ajax = new XMLHttpRequest();
-
                 let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
                 let comment = document.getElementById('comment').value;
 
-                console.log(comment);
                 var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
                 var myChkValModal = new bootstrap.Modal(document.getElementById("chkValModal"), {});
-
-                write_ajax.onload = () => {
-                    if (write_ajax.status == 200 || write_ajax.status == 201) {
-                        responseTxt = JSON.parse(write_ajax.responseText);
-
-                        const modalTitle = document.querySelector('#msgTitle');
-                        var mtTxt = document.createTextNode(responseTxt['modal_title']);
-                        modalTitle.appendChild(mtTxt);
-
-                        const modalBody = document.querySelector('#msgbody');
-                        var mbTxt = document.createTextNode(responseTxt['modal_body']);
-                        modalBody.appendChild(mbTxt);
-
-                        myModal.show();
-                    }
-                }
 
                 const data = {
                     boardId: boardId,
@@ -177,19 +207,39 @@
                     comment: comment
                 }
 
-                write_ajax.onerror = () => {
-                    console.error(write_ajax.responseText);
-                }
-
                 if (comment != '') {
-                    write_ajax.open('POST', '/api/writeComment');
-                    write_ajax.setRequestHeader('Content-Type', 'application/json');
-                    write_ajax.send(JSON.stringify(data));
+                    const url = '/api/writeComment';
+                    const init = {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'same-origin'
+                    };
 
+                    fetch(url, init)
+                        .then((res) => res.json())
+                        .then(res => {
+                            responseTxt = res;
+                            const modalTitle = document.querySelector('#msgTitle');
+                            var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                            modalTitle.appendChild(mtTxt);
+
+                            const modalBody = document.querySelector('#msgbody');
+                            var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                            modalBody.appendChild(mbTxt);
+
+                            if (res.status == 200 || res.status == 201) {
+                                myModal.show();
+
+                            } else {
+                                myWrongModal.show();
+                            }
+                        })
                 } else {
                     myChkValModal.show();
                 }
             }
-
         </script>
         <%- include ('../include/footer') -%>

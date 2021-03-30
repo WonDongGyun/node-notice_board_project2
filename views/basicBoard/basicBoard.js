@@ -33,14 +33,16 @@ router.post('/writeBoard', async (req, res) => {
 
         console.log(boardId, nickname, title, contents, day)
 
-        res.status(201).send({
+        res.status(200).send({
             result: "success",
+            status: 200,
             modal_title: "저장 성공",
             modal_body: "글이 성공적으로 저장 되었습니다."
         });
     } catch (err) {
         res.status(400).send({
             result: "fail",
+            status: 400,
             modal_title: "저장 실패",
             modal_body: "내용 확인 후, 다시 작성해주세요."
         });
@@ -73,15 +75,19 @@ router.post('/chkPassWord', async (req, res) => {
 
         if (findIdPw != null) {
             if (nowButton == 'updateButton') {
-                res.send({ result: "success" });
+                res.status(200).send({
+                    result: "success",
+                    status: 200
+                });
             } else {
                 await Board.deleteOne({
                     where: {
                         boardId
                     }
                 });
-                res.status(201).send({
+                res.status(200).send({
                     result: "success",
+                    status: 200,
                     modal_title: "삭제 성공",
                     modal_body: "글이 성공적으로 삭제 되었습니다."
                 });
@@ -89,6 +95,7 @@ router.post('/chkPassWord', async (req, res) => {
         } else {
             res.status(400).send({
                 result: "fail",
+                status: 400,
                 modal_title: "삭제 실패",
                 modal_body: "비밀번호를 확인해주세요."
             });
@@ -96,6 +103,7 @@ router.post('/chkPassWord', async (req, res) => {
     } catch (err) {
         res.status(400).send({
             result: "fail",
+            status: 400,
             modal_title: "삭제 실패",
             modal_body: "비밀번호를 확인해주세요."
         });
@@ -135,8 +143,9 @@ router.post('/updateBoard', async (req, res) => {
                     },
                 );
 
-                res.send({
+                res.status(200).send({
                     result: "success",
+                    status: 200,
                     modal_title: "수정 성공",
                     modal_body: "글이 성공적으로 수정 되었습니다."
                 });
@@ -144,16 +153,18 @@ router.post('/updateBoard', async (req, res) => {
             } else {
 
                 await board.deleteOne({ boardId });
-                res.send({
+                res.status(200).send({
                     result: "success",
+                    status: 200,
                     modal_title: "삭제 성공",
                     modal_body: "글이 성공적으로 삭제 되었습니다."
                 });
             }
         }
     } catch (err) {
-        res.send({
+        res.status(400).send({
             result: "fail",
+            status: 200,
             modal_title: "삭제 실패",
             modal_body: "제목 혹은 내용을 확인해주세요."
         });
@@ -206,15 +217,17 @@ router.post('/writeComment', async (req, res) => {
 
             await Comment.create({ commentId, boardId, nickname, comment, commentDay })
 
-            res.send({
+            res.status(200).send({
                 result: "success",
+                status: 200,
                 modal_title: "댓글 성공",
                 modal_body: "댓글을 입력했습니다."
             });
 
         } else {
-            res.send({
+            res.status(400).send({
                 result: "fail",
+                status: 400,
                 modal_title: "댓글 실패",
                 modal_body: "댓글을 다시 입력해주세요."
             });
@@ -223,8 +236,9 @@ router.post('/writeComment', async (req, res) => {
 
 
     } catch (err) {
-        res.send({
+        res.status(400).send({
             result: "fail",
+            status: 400,
             modal_title: "댓글 실패",
             modal_body: "댓글을 다시 입력해주세요."
         });

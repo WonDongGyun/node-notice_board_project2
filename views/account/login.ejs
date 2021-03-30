@@ -19,9 +19,6 @@
 
         <script>
             function login() {
-
-                const login_ajax = new XMLHttpRequest();
-
                 let nickname = document.getElementById('nickname').value;
                 let password = document.getElementById('password').value;
 
@@ -29,51 +26,56 @@
                 var myWrongModal = new bootstrap.Modal(document.getElementById("wrongModal"), {});
                 var myChkValModal = new bootstrap.Modal(document.getElementById("chkValModal"), {});
 
-                const data = {
-                    nickname: nickname,
-                    password: password
-                }
-
-                login_ajax.onload = function () {
-
-                    responseTxt = JSON.parse(login_ajax.responseText);
-
-                    const modalTitle = document.querySelector('#msgTitle');
-                    var mtTxt = document.createTextNode(responseTxt['modal_title']);
-                    modalTitle.appendChild(mtTxt);
-
-                    const modalBody = document.querySelector('#msgbody');
-                    var mbTxt = document.createTextNode(responseTxt['modal_body']);
-                    modalBody.appendChild(mbTxt);
-
-                    if (login_ajax.status == 200 || login_ajax.status == 201) {
-                        document.getElementById('exitButton').setAttribute('onclick', 'window.location.href="/"');
-                        document.getElementById('correctButton').setAttribute('onclick', 'window.location.href="/"');
-                        localStorage.setItem("token", responseTxt['token']);
-
-                    } else {
-                        document.getElementById('exitButton').setAttribute('onclick', "closeOneModal('noticeModal')");
-                        document.getElementById('correctButton').setAttribute('onclick', "closeOneModal('noticeModal')");
-
-                    }
-
-                    myModal.show();
-                }
-
-
-
-                login_ajax.onerror = function () {
-                    console.error(login_ajax.responseText);
-                }
-
                 if (nickname == '' || password == '') {
                     myChkValModal.show();
 
                 } else {
-                    login_ajax.open('POST', '/accountAPI/login');
-                    login_ajax.setRequestHeader('Content-Type', 'application/json');
-                    login_ajax.send(JSON.stringify(data));
+
+                    const data = {
+                        nickname: nickname,
+                        password: password
+                    }
+                    const url = '/accountAPI/login';
+                    const init = {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'same-origin'
+                    };
+
+                    fetch(url, init)
+                        .then((res) => res.json())
+                        .then(res => {
+                            responseTxt = res;
+
+                            const modalTitle = document.querySelector('#msgTitle');
+                            var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                            modalTitle.appendChild(mtTxt);
+
+                            const modalBody = document.querySelector('#msgbody');
+                            var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                            modalBody.appendChild(mbTxt);
+
+                            if (res.status === 200 || res.status === 201) {
+                                console.log(1)
+                                document.getElementById('exitButton').setAttribute('onclick', 'window.location.href="/"');
+                                document.getElementById('correctButton').setAttribute('onclick', 'window.location.href="/"');
+                                localStorage.setItem("token", responseTxt['token']);
+
+                            } else {
+                                document.getElementById('exitButton').setAttribute('onclick', "closeOneModal('noticeModal')");
+                                document.getElementById('correctButton').setAttribute('onclick', "closeOneModal('noticeModal')");
+
+                            }
+
+                            myModal.show();
+                        }
+                        )
                 }
+
+
             }
 
         </script>

@@ -34,32 +34,14 @@
                 updateOrDelete();
             }
 
+
+
             // 모달에서 확인 버튼을 누르면 함수 실행
             function updateOrDelete() {
-                var chk_ajax = new XMLHttpRequest();
                 var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
 
                 let title = document.getElementById('title').value;
                 let contents = document.getElementById('contents').value;
-
-                chk_ajax.onload = function () {
-                    if (chk_ajax.status == 200 || chk_ajax.status == 201) {
-                        responseTxt = JSON.parse(chk_ajax.responseText)
-
-                        if (responseTxt['result'] == 'success') {
-                            const modalTitle = document.querySelector('#msgTitle');
-                            var mtTxt = document.createTextNode(responseTxt['modal_title']);
-                            modalTitle.appendChild(mtTxt);
-
-                            const modalBody = document.querySelector('#msgbody');
-                            var mbTxt = document.createTextNode(responseTxt['modal_body']);
-                            modalBody.appendChild(mbTxt);
-
-                            myModal.show();
-
-                        }
-                    }
-                }
 
                 const data = {
                     boardId: boardId,
@@ -68,14 +50,35 @@
                     nowButton: nowButton
                 }
 
-                chk_ajax.onerror = function () {
-                    console.error(chk_ajax.responseText);
-                }
+                const url = '/api/updateBoard';
+                const init = {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin'
+                };
 
-                chk_ajax.open('POST', '/api/updateBoard');
-                chk_ajax.setRequestHeader('Content-Type', 'application/json');
-                chk_ajax.send(JSON.stringify(data));
+                fetch(url, init)
+                    .then((res) => res.json())
+                    .then(res => {
+                        responseTxt = res
+                        if (res.status == 200 || res.status == 201) {
+                            if (responseTxt['result'] == 'success') {
+                                const modalTitle = document.querySelector('#msgTitle');
+                                var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                                modalTitle.appendChild(mtTxt);
 
+                                const modalBody = document.querySelector('#msgbody');
+                                var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                                modalBody.appendChild(mbTxt);
+
+                                myModal.show();
+
+                            }
+                        }
+                    })
             }
         </script>
 

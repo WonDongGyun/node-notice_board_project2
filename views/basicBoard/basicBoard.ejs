@@ -38,41 +38,38 @@
         <script>
             // 글쓰기
             function move_writeBoard() {
-                const write_ajax = new XMLHttpRequest();
                 var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
 
-                write_ajax.onload = () => {
+                const url = '/auth/writeBoard';
+                const init = {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'authorization': 'Bearer ' + localStorage.getItem("token"),
+                    },
+                    credentials: 'same-origin'
+                };
 
-                    if (write_ajax.status == 400 || write_ajax.status == 401) {
+                fetch(url, init)
+                    .then((res) => res.json())
+                    .then(res => {
+                        if (res.status == 200 || res.status == 201) {
+                            return location.href = '/writeBoard';
+                        } else {
+                            responseTxt = res;
+                            const modalTitle = document.querySelector('#msgTitle');
+                            var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                            modalTitle.appendChild(mtTxt);
 
-                        responseTxt = JSON.parse(write_ajax.responseText);
+                            const modalBody = document.querySelector('#msgbody');
+                            var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                            modalBody.appendChild(mbTxt);
 
-                        const modalTitle = document.querySelector('#msgTitle');
-                        var mtTxt = document.createTextNode(responseTxt['modal_title']);
-                        modalTitle.appendChild(mtTxt);
-
-                        const modalBody = document.querySelector('#msgbody');
-                        var mbTxt = document.createTextNode(responseTxt['modal_body']);
-                        modalBody.appendChild(mbTxt);
-
-                        document.getElementById('exitButton').setAttribute('onclick', 'window.location.href="/login"');
-                        document.getElementById('correctButton').setAttribute('onclick', 'window.location.href="/login"');
-                        myModal.show();
-
-                    } else {
-                        window.location = '/writeBoard'
-                    }
-                }
-
-                write_ajax.onerror = () => {
-                    console.error(write_ajax.responseText);
-                }
-
-
-                write_ajax.open('GET', '/writeBoard');
-                write_ajax.setRequestHeader('authorization', 'Bearer ' + localStorage.getItem("token"));
-                write_ajax.setRequestHeader('Content-Type', 'application/json');
-                write_ajax.send();
+                            document.getElementById('exitButton').setAttribute('onclick', 'window.location.href="/login"');
+                            document.getElementById('correctButton').setAttribute('onclick', 'window.location.href="/login"');
+                            myModal.show();
+                        }
+                    })
             }
 
         </script>

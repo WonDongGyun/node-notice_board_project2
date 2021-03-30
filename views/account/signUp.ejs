@@ -23,9 +23,8 @@
     <%- include ('../include/modal') -%>
 
         <script>
+            // 댓글 추가
             function chkSignUp() {
-                const signUp_ajax = new XMLHttpRequest();
-
                 let nickname = document.getElementById('nickname').value;
                 let password = document.getElementById('password').value;
                 let chkPassword = document.getElementById('chkPassword').value;
@@ -40,36 +39,6 @@
                     password: password
                 }
 
-                signUp_ajax.onload = function () {
-
-                    responseTxt = JSON.parse(signUp_ajax.responseText);
-
-                    const modalTitle = document.querySelector('#msgTitle');
-                    var mtTxt = document.createTextNode(responseTxt['modal_title']);
-                    modalTitle.appendChild(mtTxt);
-
-                    const modalBody = document.querySelector('#msgbody');
-                    var mbTxt = document.createTextNode(responseTxt['modal_body']);
-                    modalBody.appendChild(mbTxt);
-
-                    if (signUp_ajax.status == 200 || signUp_ajax.status == 201) {
-                        document.getElementById('exitButton').setAttribute('onclick', 'window.location.href="/login"');
-                        document.getElementById('correctButton').setAttribute('onclick', 'window.location.href="/login"');
-
-                    } else {
-                        document.getElementById('exitButton').setAttribute('onclick', "closeOneModal('noticeModal')");
-                        document.getElementById('correctButton').setAttribute('onclick', "closeOneModal('noticeModal')");
-
-                    }
-
-                    myModal.show();
-                }
-
-
-                signUp_ajax.onerror = function () {
-                    console.error(signUp_ajax.responseText);
-                }
-
                 if (nickname == '' || password == '' || chkPassword == '') {
                     myChkValModal.show();
 
@@ -78,9 +47,41 @@
                         myWrongModal.show();
 
                     } else {
-                        signUp_ajax.open('POST', '/accountAPI/signUp');
-                        signUp_ajax.setRequestHeader('Content-Type', 'application/json');
-                        signUp_ajax.send(JSON.stringify(data));
+                        const url = '/accountAPI/signUp';
+                        const init = {
+                            method: 'POST',
+                            body: JSON.stringify(data),
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'same-origin'
+                        };
+
+                        fetch(url, init)
+                            .then((res) => res.json())
+                            .then(res => {
+                                responseTxt = res;
+
+                                const modalTitle = document.querySelector('#msgTitle');
+                                var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                                modalTitle.appendChild(mtTxt);
+
+                                const modalBody = document.querySelector('#msgbody');
+                                var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                                modalBody.appendChild(mbTxt);
+
+                                if (res.status == 200 || res.status == 201) {
+                                    document.getElementById('exitButton').setAttribute('onclick', 'window.location.href="/login"');
+                                    document.getElementById('correctButton').setAttribute('onclick', 'window.location.href="/login"');
+
+                                } else {
+                                    document.getElementById('exitButton').setAttribute('onclick', "closeOneModal('noticeModal')");
+                                    document.getElementById('correctButton').setAttribute('onclick', "closeOneModal('noticeModal')");
+
+                                }
+
+                                myModal.show();
+                            })
                     }
                 }
             }
