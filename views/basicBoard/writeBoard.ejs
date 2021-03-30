@@ -1,0 +1,72 @@
+<%- include ('../include/header') -%>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">제목</span>
+        <input type="text" id='title' class="form-control" placeholder="제목을 입력해주세요." aria-label="Username"
+            aria-describedby="basic-addon1">
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">내용</span>
+        <input type="text" id='contents' class="form-control" placeholder="내용을 입력해주세요." aria-label="Username"
+            aria-describedby="basic-addon1">
+    </div>
+
+
+    <button type="button" class="btn btn-info" onclick="save_blog()">글쓰기</button>
+
+    <%- include ('../include/modal') -%>
+
+
+
+        <script>
+            console.log('hello')
+
+            // 글쓰기 저장하기
+            function save_blog() {
+                const write_ajax = new XMLHttpRequest();
+                var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
+                var myChkValModal = new bootstrap.Modal(document.getElementById("chkValModal"), {});
+
+
+                let title = document.getElementById('title').value;
+                let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
+                let contents = document.getElementById('contents').value;
+
+                const data = {
+                    nickname: nickname,
+                    title: title,
+                    contents: contents
+                };
+
+
+                write_ajax.onload = function () {
+                    if (write_ajax.status == 200 || write_ajax.status == 201) {
+                        responseTxt = JSON.parse(write_ajax.responseText)
+
+                        const modalTitle = document.querySelector('#msgTitle');
+                        var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                        modalTitle.appendChild(mtTxt);
+
+                        const modalBody = document.querySelector('#msgbody');
+                        var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                        modalBody.appendChild(mbTxt);
+
+                        myModal.show();
+                    }
+                }
+
+                write_ajax.onerror = function () {
+                    console.error(write_ajax.responseText);
+                }
+
+                if (title != '' || contents != '') {
+                    write_ajax.open('POST', '/api/writeBoard');
+                    write_ajax.setRequestHeader('Content-Type', 'application/json');
+                    write_ajax.send(JSON.stringify(data));
+
+                } else {
+                    myChkValModal.show();
+                }
+            }
+
+        </script>
+        <%- include ('../include/footer') -%>

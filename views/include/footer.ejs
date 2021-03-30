@@ -1,0 +1,109 @@
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
+    integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
+    crossorigin="anonymous"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        make_header();
+    })
+
+    // 모달창 종료
+    function closeOneModal(modalId) {
+        const modal = document.getElementById(modalId);
+        const modalTitle = document.querySelector('#msgTitle');
+        const modalBody = document.querySelector('#msgbody');
+
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        modal.setAttribute('style', 'display: none');
+
+        const modalBackdrops = document.getElementsByClassName('modal-backdrop');
+
+        document.body.removeChild(modalBackdrops[0]);
+        modalTitle.innerHTML = '';
+        modalBody.innerHTML = '';
+    }
+
+    // jwt토큰 파싱
+    function parseJwt(token) {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        return JSON.parse(jsonPayload);
+    };
+
+    // header 버튼 생성
+    function make_header() {
+        if (localStorage.getItem('token') == null) {
+            var btn_Login = document.createElement('button');
+            var btn_Regi = document.createElement('button');
+            var header = document.getElementById('headerDiv');
+
+            btn_Login.type = 'button'
+            btn_Regi.type = 'button'
+
+            btn_Login.className = 'btn btn-secondary'
+            btn_Regi.className = 'btn btn-success'
+
+            btn_Login.onclick = () => {
+                window.location.href = '/login'
+            }
+
+            btn_Regi.onclick = () => {
+                window.location.href = '/signUp'
+            }
+
+            var loginTxt = document.createTextNode('로그인');
+            btn_Login.appendChild(loginTxt);
+
+            var regTxt = document.createTextNode('회원가입');
+            btn_Regi.appendChild(regTxt);
+
+
+            header.appendChild(btn_Login);
+            header.appendChild(btn_Regi);
+
+        } else {
+            var btn_LogOut = document.createElement('button');
+            var btn_main = document.createElement('button');
+            var header = document.getElementById('headerDiv');
+            let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
+
+            btn_LogOut.type = 'button';
+            btn_main.type = 'button';
+
+            btn_LogOut.className = 'btn btn-danger';
+            btn_main.className = 'btn btn-dark';
+
+            btn_LogOut.onclick = () => {
+                localStorage.removeItem('token');
+            }
+
+            btn_main.onclick = () => {
+                window.location.href = '/';
+            }
+
+            var logOutTxt = document.createTextNode('로그아웃');
+            btn_LogOut.appendChild(logOutTxt);
+
+            var mainTxt = document.createTextNode('메인 페이지');
+            btn_main.appendChild(mainTxt);
+
+            var nicknameTxt = document.createTextNode(nickname + '님 환영합니다.');
+
+            header.appendChild(btn_LogOut);
+            header.appendChild(btn_main);
+            header.appendChild(nicknameTxt);
+        }
+    }
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,79 @@
+<%- include ('../include/header') -%>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title</th>
+                <th scope="col">nickname</th>
+                <th scope="col">Day</th>
+            </tr>
+        </thead>
+        <tbody id="boardMaster">
+            <% for (var i=0; i < boards.length; i++) { %>
+                <tr>
+                    <th scope="row">
+                        <%= i + 1 %>
+                    </th>
+                    <td>
+                        <a href="/readBoard/?boardId=<%= boards[i]['boardId'] %>">
+                            <%= boards[i]['title'] %>
+                        </a>
+                    </td>
+                    <td>
+                        <%= boards[i]['nickname'] %>
+                    </td>
+                    <td>
+                        <%= boards[i]['day'].getFullYear() + '-' + parseInt(boards[i]['day'].getMonth() + 1) + '-' +
+                            boards[i]['day'].getDate() %>
+                    </td>
+                </tr>
+                <% } %>
+        </tbody>
+    </table>
+
+    <button type="button" class="btn btn-info" onclick="move_writeBoard()">글쓰기</button>
+
+    <%- include ('../include/modal') -%>
+
+        <script>
+            // 글쓰기
+            function move_writeBoard() {
+                const write_ajax = new XMLHttpRequest();
+                var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
+
+                write_ajax.onload = () => {
+
+                    if (write_ajax.status == 400 || write_ajax.status == 401) {
+
+                        responseTxt = JSON.parse(write_ajax.responseText);
+
+                        const modalTitle = document.querySelector('#msgTitle');
+                        var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                        modalTitle.appendChild(mtTxt);
+
+                        const modalBody = document.querySelector('#msgbody');
+                        var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                        modalBody.appendChild(mbTxt);
+
+                        document.getElementById('exitButton').setAttribute('onclick', 'window.location.href="/login"');
+                        document.getElementById('correctButton').setAttribute('onclick', 'window.location.href="/login"');
+                        myModal.show();
+
+                    } else {
+                        window.location = '/writeBoard'
+                    }
+                }
+
+                write_ajax.onerror = () => {
+                    console.error(write_ajax.responseText);
+                }
+
+
+                write_ajax.open('GET', '/writeBoard');
+                write_ajax.setRequestHeader('authorization', 'Bearer ' + localStorage.getItem("token"));
+                write_ajax.setRequestHeader('Content-Type', 'application/json');
+                write_ajax.send();
+            }
+
+        </script>
+        <%- include ('../include/footer') -%>

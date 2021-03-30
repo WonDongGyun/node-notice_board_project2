@@ -1,0 +1,195 @@
+<%- include ('../include/header') -%>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">제목</span>
+        <input type="text" id='title' class="form-control" aria-label="Username" aria-describedby="basic-addon1"
+            readonly value="<%= readBoard['title'] %>">
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">작성자명</span>
+        <input type="text" id='nickname' class="form-control" aria-label="Username" aria-describedby="basic-addon1"
+            readonly value="<%= readBoard['nickname'] %>">
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">작성날짜</span>
+        <input type="text" id='day' class="form-control" aria-label="Username" aria-describedby="basic-addon1" readonly
+            value="<%= readBoard['day'].getFullYear() + '-' + parseInt(readBoard['day'].getMonth() + 1) + '-' + readBoard['day'].getDate() %>">
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">내용</span>
+        <input type="text" id='contents' class="form-control" aria-label="Username" aria-describedby="basic-addon1"
+            readonly value="<%= readBoard['contents'] %>">
+    </div>
+
+    <button type="button" id="updateButton" class="btn btn-primary">수정하기</button>
+    <button type="button" id="deleteButton" class="btn btn-danger">삭제하기</button>
+
+    <div style="margin-top: 70px;">
+        <div class="input-group mb-3">
+            <span class="input-group-text">댓글</span>
+            <input type="text" id="comment" class="form-control" placeholder="댓글을 남겨주세요."
+                aria-label="Recipient's username" aria-describedby="button-addon2">
+            <button class="btn btn-outline-secondary" type="button" onclick="write_comment()">댓글 작성</button>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">nickname</th>
+                    <th scope="col">comment</th>
+                    <th scope="col">Day</th>
+                </tr>
+            </thead>
+            <tbody id="commentMaster">
+                <% for (var i=0; i < commentBoard.length; i++) { %>
+                    <tr>
+                        <th scope="row">
+                            <%= i + 1 %>
+                        </th>
+                        <td>
+                            <%= commentBoard[i]['nickname'] %>
+                        </td>
+                        <td>
+                            <%= commentBoard[i]['comment'] %>
+                        </td>
+                        <td>
+                            <%= commentBoard[i]['commentDay'].getFullYear() + '-' +
+                                parseInt(commentBoard[i]['commentDay'].getMonth() + 1) + '-' +
+                                commentBoard[i]['commentDay'].getDate() %>
+                        </td>
+                    </tr>
+                    <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <%- include ('../include/modal') -%>
+
+
+        <script>
+            const queryString = window.location.search;
+            const urlParam = new URLSearchParams(queryString);
+            const boardId = urlParam.get('boardId');
+            let nowButton = "";
+
+            document.getElementById("updateButton").onclick = function (event) {
+                nowButton = event.target.id;
+                chk_modal();
+            }
+
+            document.getElementById("deleteButton").onclick = function (event) {
+                nowButton = event.target.id;
+                chk_modal();
+            }
+
+
+            // 비밀번호 입력 모달 열기
+            function chk_modal(id) {
+                var button_id = id;
+                var myChkModal = new bootstrap.Modal(document.getElementById("chkPassword"), {});
+                myChkModal.show();
+            }
+
+
+            // 모달에서 확인 버튼을 누르면 함수 실행
+            function chkPassWord(inputPW) {
+                var chk_ajax = new XMLHttpRequest();
+                var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
+                var myWrongModal = new bootstrap.Modal(document.getElementById("wrongModal"), {});
+
+                let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
+
+                chk_ajax.onload = function () {
+                    if (chk_ajax.status == 200 || chk_ajax.status == 201) {
+
+                        responseTxt = JSON.parse(chk_ajax.responseText)
+
+                        if (responseTxt['result'] == 'success' && nowButton == 'updateButton') {
+                            location.href = '/updateBoard/?boardId=' + boardId;
+
+                        } else if (responseTxt['result'] == 'success' && nowButton == 'deleteButton') {
+                            const modalTitle = document.querySelector('#msgTitle');
+                            var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                            modalTitle.appendChild(mtTxt);
+
+                            const modalBody = document.querySelector('#msgbody');
+                            var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                            modalBody.appendChild(mbTxt);
+
+                            myModal.show();
+
+                        } else {
+                            myWrongModal.show();
+                        }
+                    } else {
+                        myWrongModal.show();
+                    }
+                }
+
+                const data = {
+                    boardId: boardId,
+                    nickname: nickname,
+                    passWord: inputPW,
+                    nowButton: nowButton
+                }
+
+                chk_ajax.onerror = function () {
+                    console.error(chk_ajax.responseText);
+                }
+
+                chk_ajax.open('POST', '/api/chkPassWord');
+                chk_ajax.setRequestHeader('Content-Type', 'application/json');
+                chk_ajax.send(JSON.stringify(data));
+            }
+
+
+
+
+            function write_comment() {
+                const write_ajax = new XMLHttpRequest();
+
+                let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
+                let comment = document.getElementById('comment').value;
+
+                console.log(comment);
+                var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
+                var myChkValModal = new bootstrap.Modal(document.getElementById("chkValModal"), {});
+
+                write_ajax.onload = () => {
+                    if (write_ajax.status == 200 || write_ajax.status == 201) {
+                        responseTxt = JSON.parse(write_ajax.responseText);
+
+                        const modalTitle = document.querySelector('#msgTitle');
+                        var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                        modalTitle.appendChild(mtTxt);
+
+                        const modalBody = document.querySelector('#msgbody');
+                        var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                        modalBody.appendChild(mbTxt);
+
+                        myModal.show();
+                    }
+                }
+
+                const data = {
+                    boardId: boardId,
+                    nickname: nickname,
+                    comment: comment
+                }
+
+                write_ajax.onerror = () => {
+                    console.error(write_ajax.responseText);
+                }
+
+                if (comment != '') {
+                    write_ajax.open('POST', '/api/writeComment');
+                    write_ajax.setRequestHeader('Content-Type', 'application/json');
+                    write_ajax.send(JSON.stringify(data));
+
+                } else {
+                    myChkValModal.show();
+                }
+            }
+
+        </script>
+        <%- include ('../include/footer') -%>

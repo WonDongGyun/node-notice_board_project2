@@ -1,0 +1,87 @@
+<!-- [삭제]비밀번호 확인 모달 -->
+<div class="modal fade" id='chkPassword' tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">비밀번호 확인</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    onclick="closeOneModal('chkPassword')"></button>
+            </div>
+            <div class="modal-body">
+                <p>비밀번호를 입력해 주세요.</p>
+                <input type="password" id='inputPW' class="form-control" placeholder="비밀번호를 입력해주세요."
+                    aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                    onclick="chkPassWord(document.getElementById('inputPW').value)">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 글쓰기 저장, 삭제, 수정 모달 -->
+<div class="modal fade" id='noticeModal' tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="msgTitle" class="modal-title"></h5>
+                <button type="button" id="exitButton" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    onclick='window.location.href="/"'></button>
+            </div>
+            <div class="modal-body">
+                <p id="msgbody"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="correctButton" class="btn btn-primary"
+                    onclick='window.location.href="/"'>확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 비밀번호가 틀렸습니다. 모달 -->
+<div class="modal fade" id='wrongModal' tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="msgWrongTitle" class="modal-title">비밀번호 오류</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    onclick="closeOneModal('wrongModal')"></button>
+            </div>
+            <div class="modal-body">
+                <p id="msgWrongbody">비밀번호를 다시 입력해 주십시오.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    onclick="closeOneModal('wrongModal')">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 필수값 입력을 해주세요. 모달 -->
+<div class="modal fade" id='chkValModal' tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="chkValTitle" class="modal-title">내용 확인</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    onclick="closeOneModal('chkValModal')"></button>
+            </div>
+            <div class="modal-body">
+                <p id="chkValbody">공란인 내용이 존재합니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    onclick="closeOneModal('chkValModal')">확인</button>
+            </div>
+        </div>
+    </div>
+</div>

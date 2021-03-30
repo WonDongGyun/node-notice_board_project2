@@ -1,0 +1,90 @@
+<%- include ('../include/header') -%>
+
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">닉네임</span>
+        <input type="text" class="form-control" id="nickname" placeholder="최소 3자 이상, 알파벳 대소문자와 숫자로 이루어져야 합니다."
+            aria-label="Username" aria-describedby="basic-addon1">
+    </div>
+
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">비밀번호</span>
+        <input type="password" class="form-control" id="password" placeholder="최소 4자 이상, 닉네임과 같은 값이 포함되면 안됩니다."
+            aria-label="Username" aria-describedby="basic-addon1">
+    </div>
+
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">비밀번호 확인</span>
+        <input type="password" class="form-control" id="chkPassword" placeholder="같은 비밀번호를 입력해주세요."
+            aria-label="Username" aria-describedby="basic-addon1">
+    </div>
+
+    <button type="button" class="btn btn-success" onclick="chkSignUp()">회원가입</button>
+
+    <%- include ('../include/modal') -%>
+
+        <script>
+            function chkSignUp() {
+                const signUp_ajax = new XMLHttpRequest();
+
+                let nickname = document.getElementById('nickname').value;
+                let password = document.getElementById('password').value;
+                let chkPassword = document.getElementById('chkPassword').value;
+
+                var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
+                var myWrongModal = new bootstrap.Modal(document.getElementById("wrongModal"), {});
+                var myChkValModal = new bootstrap.Modal(document.getElementById("chkValModal"), {});
+
+
+                const data = {
+                    nickname: nickname,
+                    password: password
+                }
+
+                signUp_ajax.onload = function () {
+
+                    responseTxt = JSON.parse(signUp_ajax.responseText);
+
+                    const modalTitle = document.querySelector('#msgTitle');
+                    var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                    modalTitle.appendChild(mtTxt);
+
+                    const modalBody = document.querySelector('#msgbody');
+                    var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                    modalBody.appendChild(mbTxt);
+
+                    if (signUp_ajax.status == 200 || signUp_ajax.status == 201) {
+                        document.getElementById('exitButton').setAttribute('onclick', 'window.location.href="/login"');
+                        document.getElementById('correctButton').setAttribute('onclick', 'window.location.href="/login"');
+
+                    } else {
+                        document.getElementById('exitButton').setAttribute('onclick', "closeOneModal('noticeModal')");
+                        document.getElementById('correctButton').setAttribute('onclick', "closeOneModal('noticeModal')");
+
+                    }
+
+                    myModal.show();
+                }
+
+
+                signUp_ajax.onerror = function () {
+                    console.error(signUp_ajax.responseText);
+                }
+
+                if (nickname == '' || password == '' || chkPassword == '') {
+                    myChkValModal.show();
+
+                } else {
+                    if (password != chkPassword) {
+                        myWrongModal.show();
+
+                    } else {
+                        signUp_ajax.open('POST', '/accountAPI/signUp');
+                        signUp_ajax.setRequestHeader('Content-Type', 'application/json');
+                        signUp_ajax.send(JSON.stringify(data));
+                    }
+                }
+            }
+
+        </script>
+
+        <%- include ('../include/footer') -%>
