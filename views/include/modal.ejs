@@ -85,3 +85,45 @@
         </div>
     </div>
 </div>
+
+<!-- 로그인을 해주세요. 모달 -->
+<div class="modal fade" id='loginModal' tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="chkValTitle" class="modal-title">로그인 필요</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    onclick="window.location.href='/login'"></button>
+            </div>
+            <div class="modal-body">
+                <p id="chkValbody">로그인을 해주세요.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    onclick="window.location.href='/login'">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 댓글 수정과 삭제시 작성자 혹은 비밀번호를 확인해주세요 -->
+<div class="modal fade" id='chkIdPwModal' tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="chkValTitle" class="modal-title">확인</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    onclick="closeOneModal('chkIdPwModal')"></button>
+            </div>
+            <div class="modal-body">
+                <p id="chkValbody">작성자 혹은 비밀번호를 확인해주세요.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    onclick="closeOneModal('chkIdPwModal')">확인</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -38,7 +38,7 @@
         <script>
             // 글쓰기
             function move_writeBoard() {
-                var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
+                var myLoginModal = new bootstrap.Modal(document.getElementById("loginModal"), {});
 
                 const url = '/auth/writeBoard';
                 const init = {
@@ -56,18 +56,7 @@
                         if (res.status == 200 || res.status == 201) {
                             return location.href = '/writeBoard';
                         } else {
-                            responseTxt = res;
-                            const modalTitle = document.querySelector('#msgTitle');
-                            var mtTxt = document.createTextNode(responseTxt['modal_title']);
-                            modalTitle.appendChild(mtTxt);
-
-                            const modalBody = document.querySelector('#msgbody');
-                            var mbTxt = document.createTextNode(responseTxt['modal_body']);
-                            modalBody.appendChild(mbTxt);
-
-                            document.getElementById('exitButton').setAttribute('onclick', 'window.location.href="/login"');
-                            document.getElementById('correctButton').setAttribute('onclick', 'window.location.href="/login"');
-                            myModal.show();
+                            myLoginModal.show();
                         }
                     })
             }

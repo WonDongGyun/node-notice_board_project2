@@ -47,10 +47,13 @@
                         <th scope="row">
                             <%= i + 1 %>
                         </th>
-                        <td>
+                        <th id="commentId<%= i + 1 %>" style="display: none;">
+                            <%= commentBoard[i]['commentId'] %>
+                        </th>
+                        <td id="reWriteNn<%= i + 1 %>">
                             <%= commentBoard[i]['nickname'] %>
                         </td>
-                        <td>
+                        <td id="reWrite<%= i + 1 %>">
                             <%= commentBoard[i]['comment'] %>
                         </td>
                         <td>
@@ -59,8 +62,10 @@
                                 commentBoard[i]['commentDay'].getDate() %>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-outline-secondary" onclick="commentUpd()">수정</button>
-                            <button type="button" class="btn btn-outline-danger" onclick="commentUpd()">삭제</button>
+                            <button type="button" id="updCommentButton<%= i + 1 %>" class="btn btn-outline-secondary"
+                                onclick="updCommentSet('<%= i + 1 %>'); chk_modal();">수정</button>
+                            <button type="button" id="delCommentButton<%= i + 1 %>" class="btn btn-outline-danger"
+                                onclick="delCommentSet('<%= i + 1 %>'); chk_modal();">삭제</button>
                         </td>
                     </tr>
                     <% } %>
@@ -69,10 +74,7 @@
     </div>
 
     <%- include ('../include/modal') -%>
-
-
         <script>
-
             document.addEventListener('DOMContentLoaded', function () {
                 make_button();
             })
@@ -81,6 +83,7 @@
             const boardId = urlParam.get('boardId');
 
             let nowButton = "";
+            let reWriteId = "";
 
             function make_button() {
                 let nickname = document.getElementById('nickname').value
@@ -131,6 +134,18 @@
                 nowButton = 'deleteButton';
             }
 
+            function updCommentSet(id) {
+                reWriteId = id;
+                nowButton = 'updComment';
+            }
+
+            function delCommentSet(id) {
+                reWriteId = id;
+                nowButton = 'delComment';
+            }
+
+
+
             // 비밀번호 입력 모달 열기
             function chk_modal() {
                 var myChkModal = new bootstrap.Modal(document.getElementById("chkPassword"), {});
@@ -140,75 +155,212 @@
 
             // 모달에서 확인 버튼을 누르면 함수 실행
             function chkPassWord(inputPW) {
-                let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
-
                 var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
                 var myWrongModal = new bootstrap.Modal(document.getElementById("wrongModal"), {});
+                var myLoginModal = new bootstrap.Modal(document.getElementById("loginModal"), {});
+                var myChkCmIdPwModal = new bootstrap.Modal(document.getElementById("chkIdPwModal"), {});
 
-                const data = {
-                    boardId: boardId,
-                    nickname: nickname,
-                    passWord: inputPW,
-                    nowButton: nowButton
-                }
 
-                const url = '/api/chkPassWord';
-                const init = {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'same-origin'
-                };
+                if (nowButton == 'updateButton' || nowButton == 'deleteButton') {
+                    // let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
+                    const data = {
+                        boardId: boardId,
+                        // nickname: nickname,
+                        passWord: inputPW,
+                        nowButton: nowButton
+                    }
 
-                fetch(url, init)
-                    .then((res) => res.json())
-                    .then(res => {
 
-                        if (res.status == 200 || res.status == 201) {
+                    const url = '/api/chkPW';
+                    const init = {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'authorization': 'Bearer ' + localStorage.getItem("token"),
+                        },
+                        credentials: 'same-origin'
+                    };
+
+                    fetch(url, init)
+                        .then((res) => res.json())
+                        .then(res => {
                             responseTxt = res;
+                            if (res.status == 200 || res.status == 201) {
+                                if (responseTxt['result'] == 'success' && nowButton == 'updateButton') {
+                                    location.href = '/updateBoard/?boardId=' + boardId;
 
-                            if (responseTxt['result'] == 'success' && nowButton == 'updateButton') {
-                                location.href = '/updateBoard/?boardId=' + boardId;
+                                } else if (responseTxt['result'] == 'success' && nowButton == 'deleteButton') {
+                                    const modalTitle = document.querySelector('#msgTitle');
+                                    var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                                    modalTitle.appendChild(mtTxt);
 
-                            } else if (responseTxt['result'] == 'success' && nowButton == 'deleteButton') {
-                                const modalTitle = document.querySelector('#msgTitle');
-                                var mtTxt = document.createTextNode(responseTxt['modal_title']);
-                                modalTitle.appendChild(mtTxt);
+                                    const modalBody = document.querySelector('#msgbody');
+                                    var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                                    modalBody.appendChild(mbTxt);
 
-                                const modalBody = document.querySelector('#msgbody');
-                                var mbTxt = document.createTextNode(responseTxt['modal_body']);
-                                modalBody.appendChild(mbTxt);
+                                    myModal.show();
 
-                                myModal.show();
-
+                                } else {
+                                    myWrongModal.show();
+                                }
                             } else {
                                 myWrongModal.show();
                             }
-                        } else {
-                            myWrongModal.show();
-                        }
-                    })
+                        })
+
+                } else {
+                    let commentId = document.getElementById('commentId' + reWriteId).innerText.replace(/\s/gi, "");
+                    const data = {
+                        commentId: commentId,
+                        boardId: boardId,
+                        passWord: inputPW,
+                        nowButton: nowButton
+                    }
+
+
+                    const url = '/api/chkCommentPW';
+                    const init = {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'authorization': 'Bearer ' + localStorage.getItem("token"),
+                        },
+                        credentials: 'same-origin'
+                    };
+
+                    fetch(url, init)
+                        .then((res) => res.json())
+                        .then(res => {
+                            responseTxt = res;
+
+                            if (res.status == 200 || res.status == 201) {
+                                if (responseTxt['result'] == 'success' && nowButton == 'updComment') {
+                                    closeOneModal('chkPassword');
+                                    let reWrite = document.getElementById('reWrite' + reWriteId);
+                                    let reWriteTxt = document.getElementById('reWrite' + reWriteId).innerText;
+
+                                    console.log(reWrite);
+                                    console.log(reWriteTxt);
+                                    reWrite.removeChild(reWrite.childNodes[0]);
+
+                                    var input1 = document.createElement('input');
+                                    input1.setAttribute('type', 'text');
+                                    input1.setAttribute('id', 'reComment' + reWriteId);
+                                    input1.setAttribute('class', 'form-control');
+                                    input1.setAttribute('placeholder', '댓글을 수정해 주세요.');
+                                    input1.setAttribute('aria-describedby', 'button-addon2');
+                                    input1.setAttribute('value', reWriteTxt);
+
+                                    reWrite.appendChild(input1)
+                                    document.getElementById("updCommentButton" + reWriteId).setAttribute("onClick", "chgCom(reWriteId)");
+
+                                } else if (responseTxt['result'] == 'success' && nowButton == 'delComment') {
+                                    const modalTitle = document.querySelector('#msgTitle');
+                                    var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                                    modalTitle.appendChild(mtTxt);
+
+                                    const modalBody = document.querySelector('#msgbody');
+                                    var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                                    modalBody.appendChild(mbTxt);
+
+                                    myModal.show();
+
+                                } else {
+                                    myWrongModal.show();
+                                }
+                            } else {
+                                if (responseTxt['modal_title'] == '로그인 필요') {
+                                    myLoginModal.show();
+                                } else {
+                                    myChkCmIdPwModal.show();
+                                }
+                            }
+                        })
+
+                }
             }
 
 
             // 댓글 추가
             function write_comment() {
-                let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
-                let comment = document.getElementById('comment').value;
 
                 var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
+                var myWrongModal = new bootstrap.Modal(document.getElementById("wrongModal"), {});
+                var myChkValModal = new bootstrap.Modal(document.getElementById("chkValModal"), {});
+                var myLoginModal = new bootstrap.Modal(document.getElementById("loginModal"), {});
+
+                let comment = document.getElementById('comment').value;
+
+                const data = {
+                    boardId: boardId,
+                    comment: comment
+                }
+
+
+                if (comment != '') {
+                    const url = '/api/writeComment';
+                    const init = {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'authorization': 'Bearer ' + localStorage.getItem("token"),
+                        },
+                        credentials: 'same-origin'
+                    };
+
+                    fetch(url, init)
+                        .then((res) => res.json())
+                        .then(res => {
+                            responseTxt = res;
+                            const modalTitle = document.querySelector('#msgTitle');
+                            var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                            modalTitle.appendChild(mtTxt);
+
+                            const modalBody = document.querySelector('#msgbody');
+                            var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                            modalBody.appendChild(mbTxt);
+
+                            if (res.status == 200 || res.status == 201) {
+                                myModal.show();
+                            } else {
+                                if (responseTxt['modal_title'] == '로그인 필요') {
+                                    myLoginModal.show();
+                                } else {
+                                    myWrongModal.show();
+                                }
+                            }
+                        })
+                } else {
+                    myChkValModal.show();
+                }
+            }
+
+
+
+            // 댓글 수정
+            function chgCom(reWriteId) {
+                let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
+                let commentId = document.getElementById('commentId' + reWriteId).innerText.replace(/\s/gi, "");
+                let comment = document.getElementById('reComment' + reWriteId).value;
+
+                var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
+                var myWrongModal = new bootstrap.Modal(document.getElementById("wrongModal"), {});
                 var myChkValModal = new bootstrap.Modal(document.getElementById("chkValModal"), {});
 
                 const data = {
+                    commentId: commentId,
                     boardId: boardId,
                     nickname: nickname,
                     comment: comment
                 }
 
+                console.log(data)
+
                 if (comment != '') {
-                    const url = '/api/writeComment';
+                    const url = '/api/chgComment';
                     const init = {
                         method: 'POST',
                         body: JSON.stringify(data),

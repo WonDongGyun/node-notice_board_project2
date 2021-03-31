@@ -50,9 +50,12 @@ router.post('/writeBoard', async (req, res) => {
 })
 
 // readBoard에서 수정하기 혹은 삭제하기 
-router.post('/chkPassWord', async (req, res) => {
+router.post('/chkPW', authMWRouter, async (req, res) => {
     try {
-        const { boardId, nickname, passWord, nowButton } = req.body;
+        const { boardId, passWord, nowButton } = req.body;
+        // const { boardId, nickname, passWord, nowButton } = req.body;
+        const { account } = res.locals;
+        const nickname = account['dataValues']['nickname'];
 
         Account.hasMany(Board, { foreignKey: 'nickname' });
         Board.belongsTo(Account, { foreignKey: 'nickname' });
@@ -80,11 +83,19 @@ router.post('/chkPassWord', async (req, res) => {
                     status: 200
                 });
             } else {
-                await Board.deleteOne({
+
+                await Comment.destroy({
                     where: {
                         boardId
                     }
                 });
+
+                await Board.destroy({
+                    where: {
+                        boardId
+                    }
+                });
+
                 res.status(200).send({
                     result: "success",
                     status: 200,
@@ -109,6 +120,78 @@ router.post('/chkPassWord', async (req, res) => {
         });
     }
 })
+
+
+
+
+// readBoard에서 댓글 수정하기 혹은 삭제하기 
+router.post('/chkCommentPW', authMWRouter, async (req, res) => {
+    try {
+        const { commentId, boardId, passWord, nowButton } = req.body;
+        // const { commentId, boardId, nickname, passWord, nowButton } = req.body;
+        const { account } = res.locals;
+        const nickname = account['dataValues']['nickname'];
+
+        Account.hasMany(Comment, { foreignKey: 'nickname' });
+        Comment.belongsTo(Account, { foreignKey: 'nickname' });
+
+        const findIdPw = await Comment.findOne({
+            include: [
+                {
+                    model: Account,
+                    required: true,
+                    where: {
+                        nickname, passWord
+                    }
+                }
+            ],
+            where: {
+                commentId, boardId
+            }
+        });
+
+        if (findIdPw != null) {
+            if (nowButton == 'updComment') {
+                res.status(200).send({
+                    result: "success",
+                    status: 200
+                });
+            } else {
+                console.log('hellowordld2')
+                await Comment.destroy({
+                    where: {
+                        commentId
+                    }
+                });
+
+                console.log('hellowordld')
+                res.status(200).send({
+                    result: "success",
+                    status: 200,
+                    modal_title: "삭제 성공",
+                    modal_body: "글이 성공적으로 삭제 되었습니다."
+                });
+            }
+        } else {
+            res.status(400).send({
+                result: "fail",
+                status: 400,
+                modal_title: "삭제 실패",
+                modal_body: "작성자와 비밀번호를 확인해주세요."
+            });
+        }
+    } catch (err) {
+        res.status(400).send({
+            result: "fail",
+            status: 400,
+            modal_title: "삭제 실패",
+            modal_body: "작성자와 비밀번호를 확인해주세요."
+        });
+    }
+})
+
+
+
 
 
 // updateBoard에서 수정하기 혹은 삭제하기 
@@ -152,7 +235,7 @@ router.post('/updateBoard', async (req, res) => {
 
             } else {
 
-                await board.deleteOne({ boardId });
+                await Board.destroy({ boardId });
                 res.status(200).send({
                     result: "success",
                     status: 200,
@@ -164,7 +247,7 @@ router.post('/updateBoard', async (req, res) => {
     } catch (err) {
         res.status(400).send({
             result: "fail",
-            status: 200,
+            status: 400,
             modal_title: "삭제 실패",
             modal_body: "제목 혹은 내용을 확인해주세요."
         });
@@ -172,27 +255,35 @@ router.post('/updateBoard', async (req, res) => {
 })
 
 
-router.post('/writeComment', async (req, res) => {
+router.post('/writeComment', authMWRouter, async (req, res) => {
     try {
-        const { boardId, nickname, comment } = req.body;
+        const { boardId, comment } = req.body;
+        const { account } = res.locals;
+        const nickname = account['dataValues']['nickname'];
+        // const { boardId, nickname, comment } = req.body;
 
-        Account.hasMany(Board, { foreignKey: 'nickname' });
-        Board.belongsTo(Account, { foreignKey: 'nickname' });
+        // Account.hasMany(Board, { foreignKey: 'nickname' });
+        // Board.belongsTo(Account, { foreignKey: 'nickname' });
 
-        const findIdPw = await Board.findOne({
-            include: [
-                {
-                    model: Account,
-                    required: true,
-                    where: {
-                        nickname
-                    }
-                }
-            ],
+        const findIdPw = await Account.findOne({
+            // include: [
+            //     {
+            //         model: Account,
+            //         required: true,
+            //         where: {
+            //             nickname
+            //         }
+            //     }
+            // ],
+            // where: {
+            //     boardId
+            // }
             where: {
-                boardId
+                nickname
             }
         });
+
+        console.log(findIdPw)
 
 
         if (findIdPw != null) {
@@ -244,6 +335,63 @@ router.post('/writeComment', async (req, res) => {
         });
     }
 })
+
+
+
+// 댓글 수정기능
+router.post('/chgComment', async (req, res) => {
+    try {
+        const { commentId, boardId, nickname, comment } = req.body;
+        const findIdPw = await Comment.findOne({
+            where: {
+                commentId, boardId, nickname
+            }
+        });
+
+        const today = new Date();
+        const utc = today.getTime() + (today.getTimezoneOffset() * 60 * 1000);
+        const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
+
+        const kr_today = new Date(utc + KR_TIME_DIFF + 32400000);
+        const commentDay = kr_today;
+
+        if (findIdPw != null) {
+            await Comment.update(
+                {
+                    comment: comment
+                },
+                {
+                    where: {
+                        commentId
+                    }
+                },
+            );
+
+            res.status(200).send({
+                result: "success",
+                status: 200,
+                modal_title: "수정 성공",
+                modal_body: "글이 성공적으로 수정 되었습니다."
+            });
+        } else {
+            res.status(400).send({
+                result: "fail",
+                status: 400,
+                modal_title: "수정 실패",
+                modal_body: "댓글 수정에 실패했습니다."
+            });
+        }
+    } catch (err) {
+        res.status(400).send({
+            result: "fail",
+            status: 400,
+            modal_title: "수정 실패",
+            modal_body: "댓글 수정에 실패했습니다."
+        });
+    }
+})
+
+
 
 
 module.exports = router;
