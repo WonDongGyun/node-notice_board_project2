@@ -1,11 +1,13 @@
 const express = require('express');
 const app = express();
 const port = 3000;
+module.exports = app;
 
 const { Account, Board, Comment } = require('./models')
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
@@ -17,8 +19,6 @@ const accountRouter = require('./views/account/account');
 app.use('/accountAPI', accountRouter)
 
 const authMWRouter = require('./authentication/auth_login');
-
-
 
 
 // 계정 관련 

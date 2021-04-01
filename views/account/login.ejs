@@ -59,7 +59,6 @@
                             modalBody.appendChild(mbTxt);
 
                             if (res.status === 200 || res.status === 201) {
-                                console.log(1)
                                 document.getElementById('exitButton').setAttribute('onclick', 'window.location.href="/"');
                                 document.getElementById('correctButton').setAttribute('onclick', 'window.location.href="/"');
                                 localStorage.setItem("token", responseTxt['token']);

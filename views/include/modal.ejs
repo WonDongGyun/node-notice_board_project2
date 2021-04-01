@@ -97,11 +97,32 @@
                     onclick="window.location.href='/login'"></button>
             </div>
             <div class="modal-body">
-                <p id="chkValbody">로그인을 해주세요.</p>
+                <p id="chkValbody">로그인이 필요합니다.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                     onclick="window.location.href='/login'">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 로그아웃 모달 -->
+<div class="modal fade" id='logOutModal' tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="chkValTitle" class="modal-title">로그아웃</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    onclick="window.location.href='/'"></button>
+            </div>
+            <div class="modal-body">
+                <p id="chkValbody">로그아웃 하셨습니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    onclick="window.location.href='/'">확인</button>
             </div>
         </div>
     </div>
@@ -123,6 +144,28 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                     onclick="closeOneModal('chkIdPwModal')">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 댓글을 삭제하시겠습니까? -->
+<div class="modal fade" id='delModal' tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="chkValTitle" class="modal-title">확인</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    onclick="closeOneModal('delModal')"></button>
+            </div>
+            <div class="modal-body">
+                <p id="chkValbody">정말로 삭제하시겠습니까?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="delYes" class="btn btn-secondary" data-bs-dismiss="modal">확인</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    onclick="closeOneModal('delModal')">취소</button>
             </div>
         </div>
     </div>

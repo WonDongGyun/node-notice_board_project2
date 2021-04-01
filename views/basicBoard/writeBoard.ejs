@@ -18,49 +18,48 @@
 
 
         <script>
-            // 글쓰기 저장하기
+            // 글쓰기 저장
             function save_blog() {
-                const write_ajax = new XMLHttpRequest();
                 var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
                 var myChkValModal = new bootstrap.Modal(document.getElementById("chkValModal"), {});
 
 
                 let title = document.getElementById('title').value;
-                let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
                 let contents = document.getElementById('contents').value;
 
                 const data = {
-                    nickname: nickname,
                     title: title,
                     contents: contents
                 };
 
-
-                write_ajax.onload = function () {
-                    if (write_ajax.status == 200 || write_ajax.status == 201) {
-                        responseTxt = JSON.parse(write_ajax.responseText)
-
-                        const modalTitle = document.querySelector('#msgTitle');
-                        var mtTxt = document.createTextNode(responseTxt['modal_title']);
-                        modalTitle.appendChild(mtTxt);
-
-                        const modalBody = document.querySelector('#msgbody');
-                        var mbTxt = document.createTextNode(responseTxt['modal_body']);
-                        modalBody.appendChild(mbTxt);
-
-                        myModal.show();
-                    }
-                }
-
-                write_ajax.onerror = function () {
-                    console.error(write_ajax.responseText);
-                }
-
                 if (title != '' || contents != '') {
-                    write_ajax.open('POST', '/api/writeBoard');
-                    write_ajax.setRequestHeader('Content-Type', 'application/json');
-                    write_ajax.send(JSON.stringify(data));
+                    const url = '/api/writeBoard';
+                    const init = {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'authorization': 'Bearer ' + localStorage.getItem("token"),
+                        },
+                        credentials: 'same-origin'
+                    };
 
+                    fetch(url, init)
+                        .then((res) => res.json())
+                        .then(res => {
+                            responseTxt = res
+                            if (res.status == 200 || res.status == 201) {
+                                const modalTitle = document.querySelector('#msgTitle');
+                                var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                                modalTitle.appendChild(mtTxt);
+
+                                const modalBody = document.querySelector('#msgbody');
+                                var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                                modalBody.appendChild(mbTxt);
+
+                                myModal.show();
+                            }
+                        })
                 } else {
                     myChkValModal.show();
                 }

@@ -159,13 +159,12 @@
                 var myWrongModal = new bootstrap.Modal(document.getElementById("wrongModal"), {});
                 var myLoginModal = new bootstrap.Modal(document.getElementById("loginModal"), {});
                 var myChkCmIdPwModal = new bootstrap.Modal(document.getElementById("chkIdPwModal"), {});
+                var myDelModal = new bootstrap.Modal(document.getElementById("delModal"), {});
 
 
                 if (nowButton == 'updateButton' || nowButton == 'deleteButton') {
-                    // let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
                     const data = {
                         boardId: boardId,
-                        // nickname: nickname,
                         passWord: inputPW,
                         nowButton: nowButton
                     }
@@ -240,9 +239,6 @@
                                     closeOneModal('chkPassword');
                                     let reWrite = document.getElementById('reWrite' + reWriteId);
                                     let reWriteTxt = document.getElementById('reWrite' + reWriteId).innerText;
-
-                                    console.log(reWrite);
-                                    console.log(reWriteTxt);
                                     reWrite.removeChild(reWrite.childNodes[0]);
 
                                     var input1 = document.createElement('input');
@@ -257,16 +253,9 @@
                                     document.getElementById("updCommentButton" + reWriteId).setAttribute("onClick", "chgCom(reWriteId)");
 
                                 } else if (responseTxt['result'] == 'success' && nowButton == 'delComment') {
-                                    const modalTitle = document.querySelector('#msgTitle');
-                                    var mtTxt = document.createTextNode(responseTxt['modal_title']);
-                                    modalTitle.appendChild(mtTxt);
-
-                                    const modalBody = document.querySelector('#msgbody');
-                                    var mbTxt = document.createTextNode(responseTxt['modal_body']);
-                                    modalBody.appendChild(mbTxt);
-
-                                    myModal.show();
-
+                                    document.getElementById("delYes").setAttribute("onClick", "delCom(reWriteId)");
+                                    closeOneModal('chkPassword');
+                                    myDelModal.show();
                                 } else {
                                     myWrongModal.show();
                                 }
@@ -324,6 +313,8 @@
                             modalBody.appendChild(mbTxt);
 
                             if (res.status == 200 || res.status == 201) {
+                                document.getElementById('exitButton').setAttribute('onclick', 'window.location.reload()');
+                                document.getElementById('correctButton').setAttribute('onclick', 'window.location.reload()');
                                 myModal.show();
                             } else {
                                 if (responseTxt['modal_title'] == '로그인 필요') {
@@ -334,7 +325,11 @@
                             }
                         })
                 } else {
-                    myChkValModal.show();
+                    if (localStorage.getItem("token") == null) {
+                        myLoginModal.show();
+                    } else {
+                        myChkValModal.show();
+                    }
                 }
             }
 
@@ -342,7 +337,6 @@
 
             // 댓글 수정
             function chgCom(reWriteId) {
-                let nickname = parseJwt(localStorage.getItem("token"))['nickname'];
                 let commentId = document.getElementById('commentId' + reWriteId).innerText.replace(/\s/gi, "");
                 let comment = document.getElementById('reComment' + reWriteId).value;
 
@@ -353,11 +347,8 @@
                 const data = {
                     commentId: commentId,
                     boardId: boardId,
-                    nickname: nickname,
                     comment: comment
                 }
-
-                console.log(data)
 
                 if (comment != '') {
                     const url = '/api/chgComment';
@@ -366,6 +357,7 @@
                         body: JSON.stringify(data),
                         headers: {
                             'Content-Type': 'application/json',
+                            'authorization': 'Bearer ' + localStorage.getItem("token")
                         },
                         credentials: 'same-origin'
                     };
@@ -383,8 +375,9 @@
                             modalBody.appendChild(mbTxt);
 
                             if (res.status == 200 || res.status == 201) {
+                                document.getElementById('exitButton').setAttribute('onclick', 'window.location.reload()');
+                                document.getElementById('correctButton').setAttribute('onclick', 'window.location.reload()');
                                 myModal.show();
-
                             } else {
                                 myWrongModal.show();
                             }
@@ -393,5 +386,55 @@
                     myChkValModal.show();
                 }
             }
+
+
+
+            // 댓글 삭제
+            function delCom(reWriteId) {
+                closeOneModal('delModal');
+                let commentId = document.getElementById('commentId' + reWriteId).innerText.replace(/\s/gi, "");
+
+                var myModal = new bootstrap.Modal(document.getElementById("noticeModal"), {});
+                var myWrongModal = new bootstrap.Modal(document.getElementById("wrongModal"), {});
+                var myChkValModal = new bootstrap.Modal(document.getElementById("chkValModal"), {});
+
+                const data = {
+                    commentId: commentId,
+                    boardId: boardId
+                }
+
+                const url = '/api/delComment';
+                const init = {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'authorization': 'Bearer ' + localStorage.getItem("token")
+                    },
+                    credentials: 'same-origin'
+                };
+
+                fetch(url, init)
+                    .then((res) => res.json())
+                    .then(res => {
+                        responseTxt = res;
+                        const modalTitle = document.querySelector('#msgTitle');
+                        var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                        modalTitle.appendChild(mtTxt);
+
+                        const modalBody = document.querySelector('#msgbody');
+                        var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                        modalBody.appendChild(mbTxt);
+
+                        if (res.status == 200 || res.status == 201) {
+                            document.getElementById('exitButton').setAttribute('onclick', 'window.location.reload()');
+                            document.getElementById('correctButton').setAttribute('onclick', 'window.location.reload()');
+                            myModal.show();
+                        } else {
+                            myWrongModal.show();
+                        }
+                    })
+            }
+
         </script>
         <%- include ('../include/footer') -%>

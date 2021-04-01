@@ -2,7 +2,7 @@
 
     <div class="input-group mb-3">
         <span class="input-group-text" id="basic-addon1">닉네임</span>
-        <input type="text" class="form-control" id="nickname" placeholder="최소 3자 이상, 알파벳 대소문자와 숫자로 이루어져야 합니다."
+        <input type="text" class="form-control" id="nickname" placeholder="최소 3자 이상, 알파벳 대소문자와 숫자의 혼합으로 이루어져야 합니다."
             aria-label="Username" aria-describedby="basic-addon1">
     </div>
 
@@ -23,7 +23,7 @@
     <%- include ('../include/modal') -%>
 
         <script>
-            // 댓글 추가
+            // 회원 가입
             function chkSignUp() {
                 let nickname = document.getElementById('nickname').value;
                 let password = document.getElementById('password').value;
@@ -36,53 +36,51 @@
 
                 const data = {
                     nickname: nickname,
-                    password: password
+                    password: password,
+                    chkPassword: chkPassword
                 }
 
                 if (nickname == '' || password == '' || chkPassword == '') {
                     myChkValModal.show();
 
                 } else {
-                    if (password != chkPassword) {
-                        myWrongModal.show();
 
-                    } else {
-                        const url = '/accountAPI/signUp';
-                        const init = {
-                            method: 'POST',
-                            body: JSON.stringify(data),
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            credentials: 'same-origin'
-                        };
+                    const url = '/accountAPI/signUp';
+                    const init = {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'same-origin'
+                    };
 
-                        fetch(url, init)
-                            .then((res) => res.json())
-                            .then(res => {
-                                responseTxt = res;
+                    fetch(url, init)
+                        .then((res) => res.json())
+                        .then(res => {
+                            responseTxt = res;
 
-                                const modalTitle = document.querySelector('#msgTitle');
-                                var mtTxt = document.createTextNode(responseTxt['modal_title']);
-                                modalTitle.appendChild(mtTxt);
+                            const modalTitle = document.querySelector('#msgTitle');
+                            var mtTxt = document.createTextNode(responseTxt['modal_title']);
+                            modalTitle.appendChild(mtTxt);
 
-                                const modalBody = document.querySelector('#msgbody');
-                                var mbTxt = document.createTextNode(responseTxt['modal_body']);
-                                modalBody.appendChild(mbTxt);
+                            const modalBody = document.querySelector('#msgbody');
+                            var mbTxt = document.createTextNode(responseTxt['modal_body']);
+                            modalBody.appendChild(mbTxt);
 
-                                if (res.status == 200 || res.status == 201) {
-                                    document.getElementById('exitButton').setAttribute('onclick', 'window.location.href="/login"');
-                                    document.getElementById('correctButton').setAttribute('onclick', 'window.location.href="/login"');
+                            if (res.status == 200 || res.status == 201) {
+                                document.getElementById('exitButton').setAttribute('onclick', 'window.location.href="/login"');
+                                document.getElementById('correctButton').setAttribute('onclick', 'window.location.href="/login"');
 
-                                } else {
-                                    document.getElementById('exitButton').setAttribute('onclick', "closeOneModal('noticeModal')");
-                                    document.getElementById('correctButton').setAttribute('onclick', "closeOneModal('noticeModal')");
+                            } else {
+                                document.getElementById('exitButton').setAttribute('onclick', "closeOneModal('noticeModal')");
+                                document.getElementById('correctButton').setAttribute('onclick', "closeOneModal('noticeModal')");
 
-                                }
+                            }
 
-                                myModal.show();
-                            })
-                    }
+                            myModal.show();
+                        })
+
                 }
             }
 
