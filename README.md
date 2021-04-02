@@ -1,5 +1,5 @@
 # node-notice_board_project2
-트리스티의 Node js + vanilla js + Sequelize + docker mysql project  
+트리스티의 Node js + vanilla js + Sequelize + docker mysql + jest project  
 [**[트리스티의 Node js + vanilla js + Sequelize + docker mysql + jest 프로젝트에 오신 여러분을 환영합니다!]**](https://tristy.tistory.com/) 
  
 [node-notice_board_project](https://github.com/WonDongGyun/node-notice_board_project)의 2탄!!!  
