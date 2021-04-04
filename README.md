@@ -16,7 +16,7 @@ use  node js, vanilla js, sequelize, docker mysql, jset
 <br/>
 <br/>
 
-사용한 패키지 및 CSS  
+😀 사용한 패키지 및 CSS  
 -----------------
 - **Express**  　　　=> node.js의 웹 프레임워크  
 - **ejs**　　　　　=> node.js의 템플릿 엔진  
@@ -30,7 +30,7 @@ use  node js, vanilla js, sequelize, docker mysql, jset
 <br/>
 
 
-폴더 구조  
+😎 폴더 구조  
 -----------------  
 
 <br/>
@@ -90,7 +90,7 @@ node-notice_board_project2
 <br/>
 
 
-작동 방식 그림 
+😆 작동 방식 그림 
 -----------------  
 
 <br/>
@@ -107,7 +107,7 @@ node-notice_board_project2
 <br/>
 
 
-무엇이 달라졌나요?
+🤔 무엇이 달라졌나요?
 ============= 
 [node-notice_board_project](https://github.com/WonDongGyun/node-notice_board_project) 에서 어떤 점이 달라졌을까요?  
 
@@ -140,7 +140,7 @@ node-notice_board_project2
 <br/>
 <br/>
 
-## mongoose (mongoDB) -> Sequelize
+## 👾 mongoose (mongoDB) -> Sequelize
 
 <br/>
 <br/>
@@ -203,7 +203,7 @@ certificate file path: 그냥 넘겨주세요
 <br/>
 
 
-## 새로운 vanilla JS AJAX  
+## 👾 새로운 vanilla JS AJAX  
 
 <br/>
 <br/>
@@ -247,7 +247,7 @@ certificate file path: 그냥 넘겨주세요
 <br/>
 
 
-## Jest 사용하기  
+## 👾 Jest 사용하기  
 
 <br/>
 <br/>
@@ -273,7 +273,7 @@ Jest 모듈을 설치하고, ```npm test ```  를 입력하면 account.spec.js�
 <br/>
 
 
-## Jwt 사용해서 로그인 관리하기  
+## 👾 Jwt 사용해서 로그인 관리하기  
 
 <br/>
 <br/>
@@ -290,7 +290,7 @@ api 호출할 때, 검증 middleware의 통과여부에 따라 기능을 나누�
 <br/>
 
 
-## Sequelize Aws EC2
+## 👾 Sequelize Aws EC2
 
 <br/>
 <br/>
