@@ -23,6 +23,7 @@ use  node js, vanilla js, sequelize, docker mysql, jset
 - **sequelize**　　=> node.js에서 DB 작업을 쉽게 해주는 ORM
 - **jest**　　　　　=> javascript 테스트 라이브러리
 - **BootStrap v5**　=> jquery는 이제 안녕~!　 jquery가 사라진 BootStrap을 사용하였습니다.  
+- **joi**　　　　　=> 데이터의 validation을 검증하는 라이브러리         
 
 
 <br/>
@@ -276,6 +277,58 @@ Jest 모듈을 설치하고, ```npm test ```  를 입력하면 account.spec.js�
 
 <br/>
 <br/>
+
+jwt란 Json Web Token으로, 인증에 필요한 정보를 암호화한 토큰을 사용하는 인증방식입니다.  
+cookie나 session에 비해 보안성이 뛰어나서 최근에 많이 사용되고 있습니다.  
+
+<br/>
+
+로그인 기능을 구현하고, 로그인 여부에 따라 기능을 나누어야 했기 때문에 middleware를 만들어서  
+api 호출할 때, 검증 middleware의 통과여부에 따라 기능을 나누었습니다.  
+
+<br/>
+<br/>
+
+
+## Sequelize Aws EC2
+
+<br/>
+<br/>
+
+=> git bash -> ssh -i pem키 복붙 ubuntu@퍼블릭IP  
+=> curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -  
+=> sudo apt-get install -y nodejs  
+=> sudo apt-get remove docker  
+=> sudo apt-get install docker.io  
+=> sudo apt-get update  
+=> docker --version 도커 버전확인해봅시다.  
+=> sudo chmod 666 /var/run/docker.sock 해서 권한을 열어주세요~  
+=> docker run -p 3306:3306 --name test-db -e MYSQL_ROOT_PASSWORD=1234 mysql:5.7 mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci  
+=> 설치하고 아예 git bash 껏다 키기~ 그리고 다시 pem키 써서 ec2 접속  
+=> docker exec -it test-db /bin/bash  하면 mysql로 접속됩니다.  
+=> mysql -u root -p  
+=> show databases; 하면 내가 원래 시퀄라이즈로 만든 DB는 없을 겁니다!!! 그러니까 깔아봅시다 우리  
+=> pm2 설치  (sudo -s => npm install -g pm2)  
+=> filezila로 프로젝트폴더 EC@로 옮겨주기  
+파일질라 [프로토콜 => SFTP], [호스트 => EC2 퍼블릭 IP], [포트 22번], [키페어 => 호스트이름 ubuntu, 키페어 파일 찾아서 넣기]  
+ubuntu 폴더에다가 프로젝트 옮기기  
+=> cd 프로젝트폴더  
+=> npm install -g sequelize-cli  
+=> npx sequelize db:create  
+=> npx sequelize db:migrate  
+=> pm2 start 시작파일  
+=>  pm2에 sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 3000 해서 뒤에 포트 안써도 접속되게 하기  
+=> AWS에서 HTTP 80번 사용자 모두에게 개방, 3306번 MYSQL 포트도 모두에게 개방하기  
+
+
+
+
+
+
+
+
+
+
 
 
 
