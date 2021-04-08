@@ -16,6 +16,26 @@ use  node js, vanilla js, sequelize, docker mysql, jset
 <br/>
 <br/>
 
+
+🤔 프로젝트 개요
+-------------  
+<ul style="list-style-type: disc;" data-ke-list-type="disc">
+<li><b>진행 날짜 - 2021.03.26 ~ 2021.04.01</b></li>
+<li><b>목적 - 팀을 이루어 Node.js를 공부하고, 각자 주어진 과제를 해결하기</b></li>
+<li><b>필수 포함 사항</b></li>
+</ul>
+
+<br/>
+<br/>
+
+<p align="center"><img src="https://user-images.githubusercontent.com/52685665/114047360-9b36bd80-98c4-11eb-90ba-e3ad52dfc96b.png"></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/52685665/114047513-b1dd1480-98c4-11eb-9bd7-222c41ee5ec3.png"></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/52685665/114047586-c0c3c700-98c4-11eb-91b9-6bd6588b6875.png"></p>
+
+<br/>
+<br/>
+
+
 😀 사용한 패키지 및 CSS  
 -----------------
 - **Express**  　　　=> node.js의 웹 프레임워크  
